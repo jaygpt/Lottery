@@ -14,7 +14,8 @@ class App extends Component {
     manager : '',
     Players : [],
     balance: '',
-    value: ''
+    value: '',
+    message: ''
   };
   async componentDidMount() {
     const manager = await lottery.methods.manager().call();
@@ -28,12 +29,24 @@ class App extends Component {
 onSubmit = async (event) => {
   event.preventDefault();
   const accounts = await web3.eth.getAccounts();
-
+  this.setState({message: ' Waiting for transcation...'})
   await lottery.methods.enter().send({
     from: accounts[0],
     value: web3.utils.toWei(this.state.value, 'ether')
   });
+  this.setState({message: ' Transcation is complete you are enter...'})
 };
+
+onClick = async () => {
+  const accounts = await web3.eth.getAccounts();
+  this.setState({message: 'Waiting for winner and transcation'})
+  await lottery.methods.pickwinner().send({
+    from: accounts[0]
+  })
+  this.setState({message: 'Transaction Complete'});
+}
+
+
 // another way to create a create a method is 
 /*
 OnSubmit(){
@@ -44,7 +57,7 @@ but in version of babel you can get rid of it
 
   render() {
 
-    web3.eth.getAccounts().then(console.log);
+    //web3.eth.getAccounts().then(console.log);
     return (
       <div className="App">
         <header className="App-header">
@@ -67,6 +80,11 @@ but in version of babel you can get rid of it
           <button>Enter</ button>
           </div>
         </form>
+        <hr />
+        <h1>{this.state.message}</h1>
+        <hr />
+        <h4> Pick Winner </h4>
+        <button onClick = {this.onClick} >Pick The Winner</button>
       </div>
       </div>
       
