@@ -13,7 +13,8 @@ class App extends Component {
   state = {
     manager : '',
     Players : [],
-    balance: ''
+    balance: '',
+    value: ''
   };
   async componentDidMount() {
     const manager = await lottery.methods.manager().call();
@@ -23,7 +24,24 @@ class App extends Component {
 
     this.setState({manager,Players,balance});
   }
-  
+ 
+onSubmit = async (event) => {
+  event.preventDefault();
+  const accounts = await web3.eth.getAccounts();
+
+  await lottery.methods.enter().send({
+    from: accounts[0],
+    value: web3.utils.toWei(this.state.value, 'ether')
+  });
+};
+// another way to create a create a method is 
+/*
+OnSubmit(){
+  this....
+}
+but in version of babel you can get rid of it
+*/
+
   render() {
 
     web3.eth.getAccounts().then(console.log);
@@ -37,6 +55,18 @@ class App extends Component {
         <p>This contract is managed by Jay Gupta(A/C: {this.state.manager})</p>
         <p>There are total {this.state.Players.length} Players</p>
         <p> With Total Balance In it {web3.utils.fromWei(this.state.balance, 'ether')} ether</p>
+        <hr />
+        <form onSubmit = {this.onSubmit}>
+        <h4>Want to test your luck </h4>
+        <div>
+          <label>Amount to be enter in pool </label>
+          <input 
+            value = {this.state.value}
+            onChange = {event => this.setState({ value: event.target.value})}
+          />
+          <button>Enter</ button>
+          </div>
+        </form>
       </div>
       </div>
       
